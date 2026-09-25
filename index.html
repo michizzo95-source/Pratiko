@@ -1,170 +1,790 @@
 <!DOCTYPE html>
 <html lang="it">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Pratiko - Calcolo Stipendio Netto</title>
-  <style>
-    :root {
-      --primary: #2563eb;
-      --bg: #f8fafc;
-      --card: #ffffff;
-      --text: #0f172a;
-    }
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-      background-color: var(--bg);
-      color: var(--text);
-      margin: 0;
-      padding: 20px;
-    }
-    .container {
-      max-width: 480px;
-      margin: 0 auto;
-      background: var(--card);
-      padding: 24px;
-      border-radius: 16px;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.08);
-    }
-    .brand {
-      font-size: 24px;
-      font-weight: 800;
-      color: var(--primary);
-      text-align: center;
-      margin-bottom: 4px;
-    }
-    .tagline {
-      font-size: 13px;
-      color: #64748b;
-      text-align: center;
-      margin-bottom: 24px;
-    }
-    .form-group {
-      margin-bottom: 16px;
-    }
-    label {
-      display: block;
-      font-size: 14px;
-      font-weight: 600;
-      margin-bottom: 6px;
-    }
-    input, select {
-      width: 100%;
-      padding: 12px;
-      border: 1px solid #cbd5e1;
-      border-radius: 8px;
-      font-size: 16px;
-      box-sizing: border-box;
-    }
-    button {
-      width: 100%;
-      background: var(--primary);
-      color: white;
-      border: none;
-      padding: 14px;
-      border-radius: 8px;
-      font-size: 16px;
-      font-weight: 700;
-      cursor: pointer;
-      margin-top: 8px;
-    }
-    .result-box {
-      margin-top: 24px;
-      padding: 16px;
-      background: #eff6ff;
-      border-radius: 12px;
-      display: none;
-    }
-    .result-item {
-      display: flex;
-      justify-content: space-between;
-      margin-bottom: 8px;
-      font-size: 14px;
-    }
-    .result-item.total {
-      font-size: 18px;
-      font-weight: 800;
-      color: var(--primary);
-      border-top: 1px solid #bfdbfe;
-      padding-top: 8px;
-      margin-top: 8px;
-    }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Pratiko Pro — Calcolatore Netto, Confronto Offerte e Simulatore Aumento 2026</title>
+<meta name="description" content="Calcola il tuo stipendio netto 2026, confronta due offerte di lavoro e simula l'impatto reale di un aumento o promozione. Report PDF gratuito.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+<style>
+:root{
+  --bg:#0a0f1c;
+  --bg-soft:#0d1526;
+  --surface:#121d33;
+  --surface-2:#16223c;
+  --border:#233252;
+  --border-soft:#1a2540;
+  --text:#e8edf7;
+  --text-dim:#8fa0c3;
+  --text-faint:#5b6b8c;
+  --blue:#4f8cff;
+  --blue-deep:#3568e0;
+  --emerald:#22c98a;
+  --emerald-deep:#17a674;
+  --rose:#fb7191;
+  --amber:#f2b84b;
+  --radius-sm:8px;
+  --radius:14px;
+  --radius-lg:20px;
+  --shadow:0 20px 50px -20px rgba(0,0,0,.55);
+  --ff-display:'Space Grotesk',system-ui,sans-serif;
+  --ff-body:'Inter',system-ui,-apple-system,sans-serif;
+}
+:root[data-theme="light"]{
+  --bg:#f4f6fb;
+  --bg-soft:#eef1f8;
+  --surface:#ffffff;
+  --surface-2:#f7f9fd;
+  --border:#e1e6f0;
+  --border-soft:#eaeef6;
+  --text:#131b2e;
+  --text-dim:#5b6b8c;
+  --text-faint:#93a1bE;
+  --shadow:0 20px 50px -25px rgba(30,42,80,.25);
+}
+*{box-sizing:border-box;}
+html{-webkit-text-size-adjust:100%;}
+body{
+  margin:0;
+  background:
+    radial-gradient(900px 500px at 100% -10%, rgba(79,140,255,.10), transparent 60%),
+    radial-gradient(700px 500px at -10% 20%, rgba(34,201,138,.07), transparent 55%),
+    var(--bg);
+  color:var(--text);
+  font-family:var(--ff-body);
+  line-height:1.5;
+  -webkit-font-smoothing:antialiased;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+  min-height:100%;
+}
+::selection{background:rgba(79,140,255,.35);}
+a{color:var(--blue);}
+h1,h2,h3{font-family:var(--ff-display); margin:0; letter-spacing:-.01em;}
+.wrap{max-width:920px; margin:0 auto; padding:0 18px;}
+
+/* ---------- TOPBAR ---------- */
+.topbar{
+  position:sticky; top:0; z-index:40;
+  background:color-mix(in srgb, var(--bg) 88%, transparent);
+  backdrop-filter:blur(10px);
+  border-bottom:1px solid var(--border-soft);
+  padding-top:env(safe-area-inset-top,0px);
+}
+.topbar-inner{display:flex; align-items:center; justify-content:space-between; padding:14px 18px; max-width:920px; margin:0 auto;}
+.logo{display:flex; align-items:center; gap:9px; font-family:var(--ff-display); font-weight:700; font-size:19px;}
+.logo .dot{width:9px; height:9px; border-radius:50%; background:linear-gradient(135deg,var(--blue),var(--emerald)); box-shadow:0 0 0 4px rgba(79,140,255,.15);}
+.logo small{display:block; font-family:var(--ff-body); font-weight:500; font-size:10.5px; color:var(--text-faint); letter-spacing:.02em;}
+.theme-btn{
+  width:38px; height:38px; border-radius:50%;
+  border:1px solid var(--border); background:var(--surface);
+  color:var(--text-dim); display:flex; align-items:center; justify-content:center;
+  cursor:pointer; font-size:16px; transition:transform .15s ease, color .15s ease, border-color .15s ease;
+}
+.theme-btn:active{transform:scale(.92);}
+
+/* ---------- HERO ---------- */
+.hero{padding:30px 0 6px;}
+.hero h1{font-size:26px; font-weight:700; max-width:640px;}
+.hero p{color:var(--text-dim); font-size:14.5px; max-width:540px; margin:10px 0 0;}
+.hero-tags{display:flex; gap:8px; flex-wrap:wrap; margin-top:16px;}
+.tag{font-size:12px; color:var(--text-dim); border:1px solid var(--border); background:var(--surface); padding:5px 10px; border-radius:999px;}
+
+/* ---------- TABS ---------- */
+.tabs{display:flex; gap:6px; margin:22px 0 18px; border-bottom:1px solid var(--border-soft); overflow-x:auto; -webkit-overflow-scrolling:touch; scrollbar-width:none;}
+.tabs::-webkit-scrollbar{display:none;}
+.tab-btn{
+  flex:0 0 auto; padding:11px 4px; margin-right:22px;
+  background:none; border:none; color:var(--text-faint); font-family:var(--ff-body);
+  font-size:14.5px; font-weight:600; cursor:pointer; white-space:nowrap;
+  position:relative; transition:color .15s ease;
+}
+.tab-btn.active{color:var(--text);}
+.tab-btn.active::after{
+  content:""; position:absolute; left:0; right:0; bottom:-1px; height:2px;
+  background:linear-gradient(90deg,var(--blue),var(--emerald)); border-radius:2px;
+}
+
+/* ---------- PANELS / CARDS ---------- */
+.panel{display:none;}
+.panel.active{display:block; animation:fade .35s ease;}
+@keyframes fade{from{opacity:0; transform:translateY(6px);} to{opacity:1; transform:translateY(0);}}
+
+.card{
+  background:var(--surface); border:1px solid var(--border); border-radius:var(--radius-lg);
+  padding:20px; margin-bottom:16px; box-shadow:var(--shadow);
+}
+.card h2{font-size:15px; font-weight:600; margin-bottom:4px;}
+.card .sub{color:var(--text-faint); font-size:12.5px; margin-bottom:16px;}
+
+.grid2{display:grid; grid-template-columns:1fr 1fr; gap:12px;}
+.field{margin-bottom:14px;}
+.field label{display:block; font-size:12.5px; font-weight:600; color:var(--text-dim); margin-bottom:6px;}
+.field .hint{display:block; font-size:11px; color:var(--text-faint); margin-top:5px; font-weight:400;}
+input[type=number], input[type=text], select{
+  width:100%; background:var(--surface-2); border:1px solid var(--border); color:var(--text);
+  font-family:var(--ff-body); font-size:15px; font-weight:600; padding:11px 12px; border-radius:var(--radius-sm);
+  appearance:none; -webkit-appearance:none;
+}
+select{
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%238fa0c3'/%3E%3C/svg%3E");
+  background-repeat:no-repeat; background-position:right 14px center; padding-right:32px;
+}
+input:focus, select:focus{outline:none; border-color:var(--blue); box-shadow:0 0 0 3px rgba(79,140,255,.18);}
+.inline-euro{position:relative;}
+.inline-euro span{position:absolute; left:12px; top:50%; transform:translateY(-50%); color:var(--text-faint); font-weight:600; font-size:14px;}
+.inline-euro input{padding-left:26px;}
+
+.check-row{display:flex; align-items:center; gap:10px; padding:11px 12px; background:var(--surface-2); border:1px solid var(--border); border-radius:var(--radius-sm); margin-bottom:10px;}
+.check-row input{width:auto; padding:0; accent-color:var(--blue); width:17px; height:17px;}
+.check-row label{font-size:13.5px; font-weight:600; color:var(--text); margin:0;}
+
+.btn{
+  display:inline-flex; align-items:center; justify-content:center; gap:8px; width:100%;
+  padding:13px 18px; border-radius:var(--radius-sm); border:none; cursor:pointer;
+  font-family:var(--ff-body); font-weight:700; font-size:14.5px; transition:transform .12s ease, filter .15s ease;
+}
+.btn:active{transform:scale(.985);}
+.btn-primary{background:linear-gradient(135deg,var(--blue),var(--blue-deep)); color:#fff; box-shadow:0 12px 24px -12px rgba(79,140,255,.55);}
+.btn-primary:hover{filter:brightness(1.08);}
+.btn-ghost{background:var(--surface-2); color:var(--text); border:1px solid var(--border);}
+.btn-emerald{background:linear-gradient(135deg,var(--emerald),var(--emerald-deep)); color:#06251a; box-shadow:0 12px 24px -12px rgba(34,201,138,.45);}
+
+/* ---------- RESULT ---------- */
+.result{display:none;}
+.result.show{display:block; animation:fade .35s ease;}
+.hero-number{
+  background:linear-gradient(155deg,var(--surface-2), var(--surface));
+  border:1px solid var(--border); border-radius:var(--radius-lg); padding:22px; text-align:center; margin-bottom:14px;
+}
+.hero-number .label{font-size:12px; font-weight:600; color:var(--text-faint); text-transform:none;}
+.hero-number .value{font-family:var(--ff-display); font-size:38px; font-weight:700; color:var(--emerald); margin-top:4px; letter-spacing:-.02em;}
+.hero-number .value small{font-size:16px; color:var(--text-dim); font-weight:600;}
+.hero-number .foot{font-size:12px; color:var(--text-faint); margin-top:6px;}
+
+.stat-grid{display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:14px;}
+.stat{background:var(--surface-2); border:1px solid var(--border); border-radius:var(--radius); padding:13px;}
+.stat .l{font-size:11.5px; color:var(--text-faint); font-weight:600;}
+.stat .v{font-family:var(--ff-display); font-size:19px; font-weight:600; margin-top:3px;}
+
+.breakdown{border-top:1px solid var(--border-soft); margin-top:6px;}
+.brow{display:flex; justify-content:space-between; align-items:center; padding:10px 0; border-bottom:1px solid var(--border-soft); font-size:13.5px;}
+.brow .k{color:var(--text-dim);}
+.brow .v{font-weight:700; font-variant-numeric:tabular-nums;}
+.brow .v.neg{color:var(--rose);}
+.brow .v.pos{color:var(--emerald);}
+.brow.total .k, .brow.total .v{color:var(--text); font-size:15px; font-weight:700;}
+
+/* ---------- COMPARE ---------- */
+.compare-grid{display:grid; grid-template-columns:1fr 1fr; gap:12px;}
+.offer-card{background:var(--surface); border:1px solid var(--border); border-radius:var(--radius-lg); padding:16px; box-shadow:var(--shadow);}
+.offer-card h3{font-size:14px; margin-bottom:2px;}
+.offer-card.a h3{color:var(--blue);}
+.offer-card.b h3{color:var(--emerald);}
+.offer-card .sub{font-size:11.5px; color:var(--text-faint); margin-bottom:12px;}
+
+.verdict{
+  border-radius:var(--radius-lg); padding:20px; text-align:center; margin:16px 0;
+  border:1px solid var(--border); background:linear-gradient(155deg,var(--surface-2),var(--surface));
+}
+.verdict .win{font-family:var(--ff-display); font-size:22px; font-weight:700;}
+.verdict .win.blue{color:var(--blue);}
+.verdict .win.emerald{color:var(--emerald);}
+.verdict .sub{font-size:13px; color:var(--text-dim); margin-top:6px;}
+
+.bars{margin-top:6px;}
+.bar-row{margin-bottom:14px;}
+.bar-row .bar-label{display:flex; justify-content:space-between; font-size:12.5px; color:var(--text-dim); margin-bottom:6px; font-weight:600;}
+.bar-track{height:10px; background:var(--surface-2); border-radius:99px; overflow:hidden; border:1px solid var(--border);}
+.bar-fill{height:100%; border-radius:99px; transition:width .6s cubic-bezier(.2,.8,.2,1);}
+.bar-fill.a{background:linear-gradient(90deg,var(--blue),#7cb2ff);}
+.bar-fill.b{background:linear-gradient(90deg,var(--emerald),#6fe3b8);}
+
+/* ---------- UPSELL ---------- */
+.upsell{
+  margin:34px 0 10px; border-radius:var(--radius-lg); padding:24px;
+  background:linear-gradient(135deg, rgba(79,140,255,.14), rgba(34,201,138,.10));
+  border:1px solid var(--border); position:relative; overflow:hidden;
+}
+.upsell::after{content:""; position:absolute; width:220px; height:220px; right:-70px; top:-70px; border-radius:50%; background:radial-gradient(circle,rgba(79,140,255,.25),transparent 70%);}
+.upsell .kicker{font-size:11.5px; font-weight:700; color:var(--emerald); letter-spacing:.02em;}
+.upsell h3{font-size:19px; margin:6px 0 8px; max-width:380px; position:relative;}
+.upsell p{font-size:13.5px; color:var(--text-dim); max-width:420px; margin:0 0 16px; position:relative;}
+.upsell .items{display:flex; gap:8px; flex-wrap:wrap; margin-bottom:16px; position:relative;}
+.upsell .item{font-size:12px; background:var(--surface); border:1px solid var(--border); padding:6px 10px; border-radius:999px; color:var(--text-dim);}
+.upsell .btn{width:auto; padding:11px 20px; position:relative;}
+
+footer{padding:26px 0 40px; text-align:center;}
+footer p{font-size:11.5px; color:var(--text-faint); max-width:520px; margin:0 auto; line-height:1.6;}
+
+@media (max-width:560px){
+  .grid2, .compare-grid, .stat-grid{grid-template-columns:1fr;}
+  .hero h1{font-size:22px;}
+  .hero-number .value{font-size:32px;}
+}
+
+/* PDF report (offscreen, rendered only for export) */
+#pdf-report{position:fixed; left:-9999px; top:0; width:700px; background:#ffffff; color:#111827; font-family:var(--ff-body); padding:40px;}
+#pdf-report .pr-logo{font-family:var(--ff-display); font-weight:700; font-size:24px; color:#1d3fae;}
+#pdf-report .pr-logo span{color:#0fa876;}
+#pdf-report h4{font-family:var(--ff-display); font-size:13px; text-transform:uppercase; letter-spacing:.05em; color:#6b7280; margin:26px 0 10px; border-bottom:1px solid #e5e7eb; padding-bottom:6px;}
+#pdf-report .prow{display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid #f0f1f4; font-size:13px;}
+#pdf-report .prow b{font-weight:700;}
+#pdf-report .prbig{background:#f0f6ff; border:1px solid #d7e6ff; border-radius:10px; padding:16px 18px; margin-top:16px;}
+#pdf-report .prbig .l{font-size:12px; color:#5b6b8c;}
+#pdf-report .prbig .v{font-family:var(--ff-display); font-size:26px; color:#0fa876; font-weight:700;}
+</style>
 </head>
 <body>
 
-<div class="container">
-  <div class="brand">PRATIKO</div>
-  <div class="tagline">Burocrazia Facile & Semplice</div>
-
-  <div class="form-group">
-    <label for="ral">Stipendio Lordo Annuale (RAL €)</label>
-    <input type="number" id="ral" placeholder="Es. 25000">
-  </div>
-
-  <div class="form-group">
-    <label for="mensilita">Numero di Mensilità</label>
-    <select id="mensilita">
-      <option value="13">13 Mensilità</option>
-      <option value="14">14 Mensilità</option>
-      <option value="12">12 Mensilità</option>
-    </select>
-  </div>
-
-  <button onclick="calcolaNetto()">Calcola Stipendio Netto</button>
-
-  <div class="result-box" id="result">
-    <div class="result-item">
-      <span>Trattenute INPS (9.19%):</span>
-      <span id="inps">0 €</span>
-    </div>
-    <div class="result-item">
-      <span>IRPEF Stimata:</span>
-      <span id="irpef">0 €</span>
-    </div>
-    <div class="result-item total">
-      <span>Netto Mensile:</span>
-      <span id="netto">0 €</span>
-    </div>
+<div class="topbar">
+  <div class="topbar-inner">
+    <div class="logo"><span class="dot"></span>PRATIKO<small>Strumenti finanziari per il lavoro</small></div>
+    <button class="theme-btn" id="themeToggle" aria-label="Cambia tema" type="button">◐</button>
   </div>
 </div>
 
+<div class="wrap">
+  <section class="hero">
+    <h1>Quanto ti resta davvero in tasca?</h1>
+    <p>Calcolatore netto 2026, confronto offerte di lavoro e simulatore di aumento: stime aggiornate su IRPEF, INPS, detrazioni e benefit reali — in venti secondi, dal telefono.</p>
+    <div class="hero-tags">
+      <span class="tag">Aggiornato scaglioni 2026</span>
+      <span class="tag">Buoni pasto e welfare inclusi</span>
+      <span class="tag">Report PDF gratuito</span>
+    </div>
+  </section>
+
+  <nav class="tabs" role="tablist">
+    <button class="tab-btn active" data-tab="netto" type="button">Calcolatore Netto</button>
+    <button class="tab-btn" data-tab="confronto" type="button">Confronto Offerte</button>
+    <button class="tab-btn" data-tab="aumento" type="button">Simulatore Aumento</button>
+  </nav>
+
+  <!-- =================== TAB 1: CALCOLATORE NETTO =================== -->
+  <section class="panel active" id="panel-netto">
+    <div class="card">
+      <h2>I tuoi dati</h2>
+      <p class="sub">Compila i campi: la stima si aggiorna al volo.</p>
+
+      <div class="field">
+        <label for="n_ral">RAL — Retribuzione Annua Lorda</label>
+        <div class="inline-euro"><span>€</span><input type="number" id="n_ral" value="32000" min="0" step="100"></div>
+      </div>
+
+      <div class="grid2">
+        <div class="field">
+          <label for="n_mensilita">Mensilità</label>
+          <select id="n_mensilita">
+            <option value="12">12 mensilità</option>
+            <option value="13" selected>13 mensilità</option>
+            <option value="14">14 mensilità</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="n_ccnl">CCNL di riferimento</label>
+          <select id="n_ccnl">
+            <option>Commercio e Terziario</option>
+            <option>Metalmeccanico Industria</option>
+            <option>Edilizia</option>
+            <option>Credito e Assicurazioni</option>
+            <option>Pubblico Impiego</option>
+            <option>Studi Professionali</option>
+            <option>Dirigenti</option>
+            <option>Altro / non specificato</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="check-row">
+        <input type="checkbox" id="n_coniuge">
+        <label for="n_coniuge">Coniuge a carico</label>
+      </div>
+      <div class="field">
+        <label for="n_figli">Figli maggiorenni a carico (con detrazione IRPEF residua)</label>
+        <input type="number" id="n_figli" value="0" min="0" step="1">
+        <span class="hint">Per i figli under 21 la detrazione IRPEF è sostituita dall'Assegno Unico Universale, non incluso in questo calcolo.</span>
+      </div>
+
+      <div class="check-row">
+        <input type="checkbox" id="n_addiz" checked>
+        <label for="n_addiz">Applica addizionale regionale e comunale</label>
+      </div>
+      <div class="grid2">
+        <div class="field">
+          <label for="n_reg">Addizionale regionale</label>
+          <div class="inline-euro"><span>%</span><input type="number" id="n_reg" value="1.23" step="0.01"></div>
+        </div>
+        <div class="field">
+          <label for="n_com">Addizionale comunale</label>
+          <div class="inline-euro"><span>%</span><input type="number" id="n_com" value="0.50" step="0.01"></div>
+        </div>
+      </div>
+
+      <div class="grid2">
+        <div class="field">
+          <label for="n_buonoval">Buono pasto — importo giornaliero</label>
+          <div class="inline-euro"><span>€</span><input type="number" id="n_buonoval" value="8" step="0.5"></div>
+        </div>
+        <div class="field">
+          <label for="n_buonogg">Giorni lavorati al mese</label>
+          <input type="number" id="n_buonogg" value="21" step="1">
+        </div>
+      </div>
+      <div class="field">
+        <label for="n_welfare">Welfare aziendale mensile (netto, es. flexible benefit)</label>
+        <div class="inline-euro"><span>€</span><input type="number" id="n_welfare" value="0" step="10"></div>
+      </div>
+
+      <button class="btn btn-primary" id="btnCalcolaNetto" type="button">Calcola il mio netto reale</button>
+    </div>
+
+    <div class="result" id="res-netto">
+      <div class="hero-number">
+        <div class="label">Potere d'acquisto mensile reale</div>
+        <div class="value" id="rn_potere">€ 0<small>/mese</small></div>
+        <div class="foot" id="rn_foot">Netto in busta + buoni pasto + welfare</div>
+      </div>
+      <div class="stat-grid">
+        <div class="stat"><div class="l">Netto in busta / mese</div><div class="v" id="rn_bustamensile">€0</div></div>
+        <div class="stat"><div class="l">Netto annuo totale</div><div class="v" id="rn_nettoannuo">€0</div></div>
+      </div>
+      <div class="card" style="margin-bottom:0; box-shadow:none;">
+        <h2>Dettaglio ripartizione</h2>
+        <div class="breakdown">
+          <div class="brow"><span class="k">RAL</span><span class="v" id="rn_ral">€0</span></div>
+          <div class="brow"><span class="k">Contributi INPS (9,19%)</span><span class="v neg" id="rn_inps">−€0</span></div>
+          <div class="brow"><span class="k">Imponibile fiscale</span><span class="v" id="rn_imponibile">€0</span></div>
+          <div class="brow"><span class="k">IRPEF lorda</span><span class="v neg" id="rn_irpeflorda">−€0</span></div>
+          <div class="brow"><span class="k">Detrazioni lavoro + familiari</span><span class="v pos" id="rn_detrazioni">+€0</span></div>
+          <div class="brow"><span class="k">Addizionali regionale + comunale</span><span class="v neg" id="rn_addizionali">−€0</span></div>
+          <div class="brow total"><span class="k">Netto annuo</span><span class="v" id="rn_nettoannuo2">€0</span></div>
+        </div>
+      </div>
+      <button class="btn btn-emerald" id="btnPdfNetto" type="button" style="margin-top:14px;">⬇ Scarica report PDF gratuito</button>
+    </div>
+  </section>
+
+  <!-- =================== TAB 2: CONFRONTO OFFERTE =================== -->
+  <section class="panel" id="panel-confronto">
+    <div class="card">
+      <h2>Confronta due proposte</h2>
+      <p class="sub">Stessi criteri, due offerte: scopri quale ti lascia davvero di più in tasca.</p>
+      <div class="compare-grid">
+        <div class="offer-card a">
+          <h3>Offerta A</h3>
+          <div class="sub">Proposta attuale o principale</div>
+          <div class="field"><label>RAL</label><div class="inline-euro"><span>€</span><input type="number" id="a_ral" value="30000" step="500"></div></div>
+          <div class="field"><label>Mensilità</label>
+            <select id="a_mensilita"><option value="12">12</option><option value="13" selected>13</option><option value="14">14</option></select>
+          </div>
+          <div class="field"><label>Buono pasto / giorno</label><div class="inline-euro"><span>€</span><input type="number" id="a_buono" value="7" step="0.5"></div></div>
+          <div class="field"><label>Giorni lavorati / mese</label><input type="number" id="a_giorni" value="21"></div>
+          <div class="field"><label>Welfare + altri benefit mensili netti</label><div class="inline-euro"><span>€</span><input type="number" id="a_welfare" value="0" step="10"></div></div>
+        </div>
+        <div class="offer-card b">
+          <h3>Offerta B</h3>
+          <div class="sub">Nuova proposta da valutare</div>
+          <div class="field"><label>RAL</label><div class="inline-euro"><span>€</span><input type="number" id="b_ral" value="33000" step="500"></div></div>
+          <div class="field"><label>Mensilità</label>
+            <select id="b_mensilita"><option value="12">12</option><option value="13" selected>13</option><option value="14">14</option></select>
+          </div>
+          <div class="field"><label>Buono pasto / giorno</label><div class="inline-euro"><span>€</span><input type="number" id="b_buono" value="4" step="0.5"></div></div>
+          <div class="field"><label>Giorni lavorati / mese</label><input type="number" id="b_giorni" value="21"></div>
+          <div class="field"><label>Welfare + altri benefit mensili netti</label><div class="inline-euro"><span>€</span><input type="number" id="b_welfare" value="150" step="10"></div></div>
+        </div>
+      </div>
+      <button class="btn btn-primary" id="btnConfronta" type="button" style="margin-top:6px;">Confronta le offerte</button>
+    </div>
+
+    <div class="result" id="res-confronto">
+      <div class="verdict">
+        <div class="win" id="cf_winner">—</div>
+        <div class="sub" id="cf_sub">Compila i dati e premi Confronta</div>
+      </div>
+      <div class="card" style="box-shadow:none;">
+        <h2>Potere d'acquisto mensile reale</h2>
+        <div class="bars">
+          <div class="bar-row">
+            <div class="bar-label"><span>Offerta A</span><span id="cf_a_val">€0</span></div>
+            <div class="bar-track"><div class="bar-fill a" id="cf_a_bar" style="width:0%"></div></div>
+          </div>
+          <div class="bar-row">
+            <div class="bar-label"><span>Offerta B</span><span id="cf_b_val">€0</span></div>
+            <div class="bar-track"><div class="bar-fill b" id="cf_b_bar" style="width:0%"></div></div>
+          </div>
+        </div>
+        <div class="breakdown">
+          <div class="brow"><span class="k">Netto in busta / mese — A</span><span class="v" id="cf_a_busta">€0</span></div>
+          <div class="brow"><span class="k">Netto in busta / mese — B</span><span class="v" id="cf_b_busta">€0</span></div>
+          <div class="brow total"><span class="k">Differenza mensile reale</span><span class="v" id="cf_diff">€0</span></div>
+        </div>
+      </div>
+      <button class="btn btn-emerald" id="btnPdfConfronto" type="button" style="margin-top:14px;">⬇ Scarica report PDF gratuito</button>
+    </div>
+  </section>
+
+  <!-- =================== TAB 3: SIMULATORE AUMENTO =================== -->
+  <section class="panel" id="panel-aumento">
+    <div class="card">
+      <h2>Simula un aumento o una promozione</h2>
+      <p class="sub">Scopri quanto del lordo in più diventa davvero netto ogni mese.</p>
+      <div class="field"><label>RAL attuale</label><div class="inline-euro"><span>€</span><input type="number" id="u_attuale" value="30000" step="500"></div></div>
+      <div class="field"><label>RAL proposta</label><div class="inline-euro"><span>€</span><input type="number" id="u_nuova" value="35000" step="500"></div></div>
+      <div class="field"><label>Mensilità</label>
+        <select id="u_mensilita"><option value="12">12</option><option value="13" selected>13</option><option value="14">14</option></select>
+      </div>
+      <button class="btn btn-primary" id="btnSimulaAumento" type="button">Simula l'aumento</button>
+    </div>
+
+    <div class="result" id="res-aumento">
+      <div class="hero-number">
+        <div class="label">Extra netto reale in busta ogni mese</div>
+        <div class="value" id="au_extra">€ 0<small>/mese</small></div>
+        <div class="foot" id="au_foot">Su un aumento lordo di €0/anno</div>
+      </div>
+      <div class="stat-grid">
+        <div class="stat"><div class="l">Aliquota marginale IRPEF</div><div class="v" id="au_aliquota">0%</div></div>
+        <div class="stat"><div class="l">Efficienza dell'aumento</div><div class="v" id="au_efficienza">0%</div></div>
+      </div>
+      <div class="card" style="margin-bottom:0; box-shadow:none;">
+        <h2>Prima e dopo</h2>
+        <div class="breakdown">
+          <div class="brow"><span class="k">Netto mensile attuale</span><span class="v" id="au_nettoattuale">€0</span></div>
+          <div class="brow"><span class="k">Netto mensile con l'aumento</span><span class="v" id="au_nettonuovo">€0</span></div>
+          <div class="brow total"><span class="k">Differenza mensile</span><span class="v pos" id="au_diff">+€0</span></div>
+        </div>
+      </div>
+      <button class="btn btn-emerald" id="btnPdfAumento" type="button" style="margin-top:14px;">⬇ Scarica report PDF gratuito</button>
+    </div>
+  </section>
+
+  <section class="upsell">
+    <div class="kicker">PRATIKO ASSET</div>
+    <h3>Template Excel e strumenti di finanza personale pronti all'uso</h3>
+    <p>Budget mensile automatico, piano di ammortamento mutuo, tracker investimenti e cedolino da controllare: fogli di calcolo professionali, zero abbonamento.</p>
+    <div class="items">
+      <span class="item">📊 Budget familiare automatico</span>
+      <span class="item">🏠 Simulatore mutuo</span>
+      <span class="item">📈 Tracker portafoglio investimenti</span>
+      <span class="item">🧾 Verifica busta paga</span>
+    </div>
+    <a class="btn btn-primary" href="#" style="text-decoration:none;">Scopri i template →</a>
+  </section>
+
+  <footer>
+    <p>Le stime sono calcolate su scaglioni IRPEF, detrazioni e aliquota media INPS indicativi per il 2026 e hanno finalità puramente orientativa: non tengono conto di ogni specificità del CCNL applicato, di eventuali ulteriori bonus fiscali o della situazione contributiva individuale. Per una consulenza vincolante rivolgiti a un commercialista o consulente del lavoro. © Pratiko</p>
+  </footer>
+</div>
+
+<!-- Offscreen template used to generate the PDF report -->
+<div id="pdf-report">
+  <div class="pr-logo">PRATIKO<span>.</span></div>
+  <div style="color:#6b7280;font-size:12px;margin-top:4px;" id="pr_subtitle">Report generato il —</div>
+  <h4 id="pr_h4main">Riepilogo</h4>
+  <div id="pr_body"></div>
+</div>
+
 <script>
-function calcolaNetto() {
-  const ral = parseFloat(document.getElementById('ral').value);
-  const mensilita = parseInt(document.getElementById('mensilita').value);
+(function(){
+"use strict";
 
-  if (!ral || ral <= 0) {
-    alert("Inserisci una RAL valida!");
-    return;
-  }
+/* ---------------- THEME ---------------- */
+var root = document.documentElement;
+var saved = null;
+try{ saved = window.localStorage.getItem('pratiko-theme'); }catch(e){}
+if(saved) root.setAttribute('data-theme', saved);
+document.getElementById('themeToggle').addEventListener('click', function(){
+  var cur = root.getAttribute('data-theme') === 'light' ? 'light' : 'dark';
+  var next = cur === 'light' ? 'dark' : 'light';
+  if(next === 'dark'){ root.removeAttribute('data-theme'); } else { root.setAttribute('data-theme','light'); }
+  try{ window.localStorage.setItem('pratiko-theme', next); }catch(e){}
+});
 
-  // Calcolo Contributi INPS (circa 9.19%)
-  const inpsAnnuo = ral * 0.0919;
-  const imponibileIrpef = ral - inpsAnnuo;
+/* ---------------- TABS ---------------- */
+var tabBtns = document.querySelectorAll('.tab-btn');
+tabBtns.forEach(function(btn){
+  btn.addEventListener('click', function(){
+    tabBtns.forEach(function(b){ b.classList.remove('active'); });
+    btn.classList.add('active');
+    document.querySelectorAll('.panel').forEach(function(p){ p.classList.remove('active'); });
+    document.getElementById('panel-' + btn.dataset.tab).classList.add('active');
+  });
+});
 
-  // Calcolo IRPEF a scaglioni
-  let irpefAnnua = 0;
-  if (imponibileIrpef <= 28000) {
-    irpefAnnua = imponibileIrpef * 0.23;
-  } else if (imponibileIrpef <= 50000) {
-    irpefAnnua = (28000 * 0.23) + ((imponibileIrpef - 28000) * 0.35);
-  } else {
-    irpefAnnua = (28000 * 0.23) + (22000 * 0.35) + ((imponibileIrpef - 50000) * 0.43);
-  }
-
-  // Calcolo Netto Annuo e Mensile
-  const nettoAnnuo = imponibileIrpef - irpefAnnua;
-  const nettoMensile = nettoAnnuo / mensilita;
-
-  // Output Dati
-  document.getElementById('inps').innerText = Math.round(inpsAnnuo / mensilita) + ' €/mese';
-  document.getElementById('irpef').innerText = Math.round(irpefAnnua / mensilita) + ' €/mese';
-  document.getElementById('netto').innerText = Math.round(nettoMensile) + ' €';
-
-  document.getElementById('result').style.display = 'block';
+/* ---------------- FORMAT ---------------- */
+function fmt(n){
+  n = Math.round(n || 0);
+  return '€' + n.toLocaleString('it-IT');
 }
-</script>
+function fmt2(n){
+  return (n||0).toLocaleString('it-IT', {minimumFractionDigits:2, maximumFractionDigits:2});
+}
 
+/* ---------------- TAX ENGINE 2026 (indicativo) ---------------- */
+var INPS_RATE = 0.0919;
+
+function irpefLorda(imp){
+  if(imp <= 0) return 0;
+  if(imp <= 28000) return imp * 0.23;
+  if(imp <= 50000) return 28000*0.23 + (imp-28000)*0.35;
+  return 28000*0.23 + 22000*0.35 + (imp-50000)*0.43;
+}
+function aliquotaMarginale(imp){
+  if(imp <= 28000) return 23;
+  if(imp <= 50000) return 35;
+  return 43;
+}
+function detrazioneLavoro(imp){
+  if(imp <= 0) return 0;
+  if(imp <= 15000) return 1955;
+  if(imp <= 28000) return 1910 + 1190*(28000-imp)/13000;
+  if(imp <= 50000) return Math.max(0, 1910*(50000-imp)/22000);
+  return 0;
+}
+function ulterioreDetrazione(imp){
+  if(imp > 20000 && imp <= 32000) return 1000;
+  if(imp > 32000 && imp < 40000) return 1000*(40000-imp)/8000;
+  return 0;
+}
+
+function calcolaNetto(p){
+  var ral = p.ral || 0;
+  var mensilita = p.mensilita || 13;
+  var contributiINPS = ral * INPS_RATE;
+  var imponibile = Math.max(0, ral - contributiINPS);
+  var irpefL = irpefLorda(imponibile);
+  var detrLav = detrazioneLavoro(imponibile);
+  var detrUlt = ulterioreDetrazione(imponibile);
+  var detrFam = (p.coniuge ? 690 : 0) + (p.figli || 0) * 950;
+  var detrazioniTot = detrLav + detrUlt + detrFam;
+  var irpefNetta = Math.max(0, irpefL - detrazioniTot);
+  var addizionali = 0;
+  if(p.applicaAddiz && imponibile > 8500){
+    addizionali = imponibile * (((p.regionale||0) + (p.comunale||0)) / 100);
+  }
+  var nettoAnnuo = ral - contributiINPS - irpefNetta - addizionali;
+  var nettoMensileBusta = nettoAnnuo / mensilita;
+  var buoniMensili = (p.buonoVal || 0) * (p.buonoGiorni || 0);
+  var welfare = p.welfare || 0;
+  var potereAcquisto = nettoMensileBusta + buoniMensili + welfare;
+  return {
+    ral: ral, contributiINPS: contributiINPS, imponibile: imponibile,
+    irpefLorda: irpefL, detrLavoro: detrLav, detrUlteriore: detrUlt, detrFamiliari: detrFam,
+    detrazioniTot: detrazioniTot, irpefNetta: irpefNetta, addizionali: addizionali,
+    nettoAnnuo: nettoAnnuo, nettoMensileBusta: nettoMensileBusta,
+    buoniMensili: buoniMensili, welfare: welfare, potereAcquisto: potereAcquisto,
+    aliquotaMarginale: aliquotaMarginale(imponibile)
+  };
+}
+
+/* ---------------- TAB 1: CALCOLATORE NETTO ---------------- */
+var lastNetto = null;
+function runNetto(){
+  var p = {
+    ral: parseFloat(document.getElementById('n_ral').value) || 0,
+    mensilita: parseFloat(document.getElementById('n_mensilita').value) || 13,
+    coniuge: document.getElementById('n_coniuge').checked,
+    figli: parseFloat(document.getElementById('n_figli').value) || 0,
+    applicaAddiz: document.getElementById('n_addiz').checked,
+    regionale: parseFloat(document.getElementById('n_reg').value) || 0,
+    comunale: parseFloat(document.getElementById('n_com').value) || 0,
+    buonoVal: parseFloat(document.getElementById('n_buonoval').value) || 0,
+    buonoGiorni: parseFloat(document.getElementById('n_buonogg').value) || 0,
+    welfare: parseFloat(document.getElementById('n_welfare').value) || 0
+  };
+  var r = calcolaNetto(p);
+  lastNetto = r; lastNetto.ccnl = document.getElementById('n_ccnl').value; lastNetto.mensilita = p.mensilita;
+
+  document.getElementById('rn_potere').innerHTML = fmt(r.potereAcquisto) + '<small>/mese</small>';
+  document.getElementById('rn_foot').textContent = fmt(r.nettoMensileBusta) + ' netto in busta + ' + fmt(r.buoniMensili) + ' buoni pasto + ' + fmt(r.welfare) + ' welfare';
+  document.getElementById('rn_bustamensile').textContent = fmt(r.nettoMensileBusta);
+  document.getElementById('rn_nettoannuo').textContent = fmt(r.nettoAnnuo);
+  document.getElementById('rn_ral').textContent = fmt(r.ral);
+  document.getElementById('rn_inps').textContent = '−' + fmt(r.contributiINPS);
+  document.getElementById('rn_imponibile').textContent = fmt(r.imponibile);
+  document.getElementById('rn_irpeflorda').textContent = '−' + fmt(r.irpefLorda);
+  document.getElementById('rn_detrazioni').textContent = '+' + fmt(r.detrazioniTot);
+  document.getElementById('rn_addizionali').textContent = '−' + fmt(r.addizionali);
+  document.getElementById('rn_nettoannuo2').textContent = fmt(r.nettoAnnuo);
+  document.getElementById('res-netto').classList.add('show');
+}
+document.getElementById('btnCalcolaNetto').addEventListener('click', runNetto);
+
+/* ---------------- TAB 2: CONFRONTO OFFERTE ---------------- */
+var lastConfronto = null;
+function runConfronto(){
+  var pa = {
+    ral: parseFloat(document.getElementById('a_ral').value) || 0,
+    mensilita: parseFloat(document.getElementById('a_mensilita').value) || 13,
+    applicaAddiz: true, regionale: 1.23, comunale: 0.5,
+    buonoVal: parseFloat(document.getElementById('a_buono').value) || 0,
+    buonoGiorni: parseFloat(document.getElementById('a_giorni').value) || 0,
+    welfare: parseFloat(document.getElementById('a_welfare').value) || 0
+  };
+  var pb = {
+    ral: parseFloat(document.getElementById('b_ral').value) || 0,
+    mensilita: parseFloat(document.getElementById('b_mensilita').value) || 13,
+    applicaAddiz: true, regionale: 1.23, comunale: 0.5,
+    buonoVal: parseFloat(document.getElementById('b_buono').value) || 0,
+    buonoGiorni: parseFloat(document.getElementById('b_giorni').value) || 0,
+    welfare: parseFloat(document.getElementById('b_welfare').value) || 0
+  };
+  var ra = calcolaNetto(pa), rb = calcolaNetto(pb);
+  lastConfronto = {a: ra, b: rb};
+
+  var diff = rb.potereAcquisto - ra.potereAcquisto;
+  var winnerEl = document.getElementById('cf_winner');
+  var subEl = document.getElementById('cf_sub');
+  if(Math.abs(diff) < 1){
+    winnerEl.textContent = 'Le offerte sono equivalenti';
+    winnerEl.className = 'win';
+    subEl.textContent = 'Differenza di potere d\'acquisto mensile inferiore a 1€.';
+  } else if(diff > 0){
+    winnerEl.textContent = 'Offerta B conviene di più';
+    winnerEl.className = 'win emerald';
+    subEl.textContent = '+' + fmt(diff) + ' al mese di potere d\'acquisto reale (' + fmt(diff*12) + ' l\'anno)';
+  } else {
+    winnerEl.textContent = 'Offerta A conviene di più';
+    winnerEl.className = 'win blue';
+    subEl.textContent = '+' + fmt(-diff) + ' al mese di potere d\'acquisto reale (' + fmt(-diff*12) + ' l\'anno)';
+  }
+
+  var maxVal = Math.max(ra.potereAcquisto, rb.potereAcquisto, 1);
+  document.getElementById('cf_a_val').textContent = fmt(ra.potereAcquisto) + '/mese';
+  document.getElementById('cf_b_val').textContent = fmt(rb.potereAcquisto) + '/mese';
+  document.getElementById('cf_a_bar').style.width = Math.max(4, (ra.potereAcquisto/maxVal*100)) + '%';
+  document.getElementById('cf_b_bar').style.width = Math.max(4, (rb.potereAcquisto/maxVal*100)) + '%';
+  document.getElementById('cf_a_busta').textContent = fmt(ra.nettoMensileBusta);
+  document.getElementById('cf_b_busta').textContent = fmt(rb.nettoMensileBusta);
+  var dEl = document.getElementById('cf_diff');
+  dEl.textContent = (diff>=0?'+':'−') + fmt(Math.abs(diff));
+  document.getElementById('res-confronto').classList.add('show');
+}
+document.getElementById('btnConfronta').addEventListener('click', runConfronto);
+
+/* ---------------- TAB 3: SIMULATORE AUMENTO ---------------- */
+var lastAumento = null;
+function runAumento(){
+  var mensilita = parseFloat(document.getElementById('u_mensilita').value) || 13;
+  var ralAttuale = parseFloat(document.getElementById('u_attuale').value) || 0;
+  var ralNuova = parseFloat(document.getElementById('u_nuova').value) || 0;
+  var rA = calcolaNetto({ral: ralAttuale, mensilita: mensilita, applicaAddiz:true, regionale:1.23, comunale:0.5});
+  var rB = calcolaNetto({ral: ralNuova, mensilita: mensilita, applicaAddiz:true, regionale:1.23, comunale:0.5});
+  lastAumento = {attuale: rA, nuova: rB, aumentoLordo: ralNuova - ralAttuale};
+
+  var extraMensile = rB.nettoMensileBusta - rA.nettoMensileBusta;
+  var aumentoLordo = ralNuova - ralAttuale;
+  var efficienza = aumentoLordo > 0 ? ((extraMensile*mensilita) / aumentoLordo * 100) : 0;
+
+  document.getElementById('au_extra').innerHTML = fmt(extraMensile) + '<small>/mese</small>';
+  document.getElementById('au_foot').textContent = 'Su un aumento lordo di ' + fmt(aumentoLordo) + '/anno';
+  document.getElementById('au_aliquota').textContent = rB.aliquotaMarginale + '%';
+  document.getElementById('au_efficienza').textContent = Math.max(0, efficienza).toFixed(0) + '%';
+  document.getElementById('au_nettoattuale').textContent = fmt(rA.nettoMensileBusta);
+  document.getElementById('au_nettonuovo').textContent = fmt(rB.nettoMensileBusta);
+  document.getElementById('au_diff').textContent = '+' + fmt(extraMensile);
+  document.getElementById('res-aumento').classList.add('show');
+}
+document.getElementById('btnSimulaAumento').addEventListener('click', runAumento);
+
+/* ---------------- PDF EXPORT ---------------- */
+function buildReportHTML(title, rows, bigLabel, bigValue){
+  var dateStr = new Date().toLocaleDateString('it-IT', {day:'2-digit', month:'long', year:'numeric'});
+  document.getElementById('pr_subtitle').textContent = 'Report generato il ' + dateStr;
+  document.getElementById('pr_h4main').textContent = title;
+  var html = '';
+  rows.forEach(function(sec){
+    html += '<h4>' + sec.title + '</h4>';
+    sec.rows.forEach(function(r){
+      html += '<div class="prow"><span>' + r[0] + '</span><b>' + r[1] + '</b></div>';
+    });
+  });
+  if(bigLabel){
+    html += '<div class="prbig"><div class="l">' + bigLabel + '</div><div class="v">' + bigValue + '</div></div>';
+  }
+  document.getElementById('pr_body').innerHTML = html;
+}
+
+function exportPdf(filename){
+  var el = document.getElementById('pdf-report');
+  var opt = {
+    margin: 0,
+    filename: filename,
+    image: {type:'jpeg', quality:0.98},
+    html2canvas: {scale:2, backgroundColor:'#ffffff'},
+    jsPDF: {unit:'pt', format:'a4', orientation:'portrait'}
+  };
+  html2pdf().set(opt).from(el).save();
+}
+
+document.getElementById('btnPdfNetto').addEventListener('click', function(){
+  if(!lastNetto){ runNetto(); }
+  var r = lastNetto;
+  buildReportHTML('Calcolatore Netto — ' + r.ccnl, [
+    {title:'Dati inseriti', rows:[
+      ['RAL', fmt(r.ral)],
+      ['Mensilità', r.mensilita],
+      ['CCNL', r.ccnl]
+    ]},
+    {title:'Ripartizione fiscale e contributiva', rows:[
+      ['Contributi INPS (9,19%)', '−' + fmt(r.contributiINPS)],
+      ['Imponibile fiscale', fmt(r.imponibile)],
+      ['IRPEF lorda', '−' + fmt(r.irpefLorda)],
+      ['Detrazioni totali', '+' + fmt(r.detrazioniTot)],
+      ['Addizionali reg. + com.', '−' + fmt(r.addizionali)],
+      ['Netto annuo', fmt(r.nettoAnnuo)],
+      ['Netto mensile in busta', fmt(r.nettoMensileBusta)],
+      ['Buoni pasto / mese', fmt(r.buoniMensili)],
+      ['Welfare / mese', fmt(r.welfare)]
+    ]}
+  ], 'Potere d\'acquisto mensile reale', fmt(r.potereAcquisto) + '/mese');
+  exportPdf('pratiko-calcolatore-netto.pdf');
+});
+
+document.getElementById('btnPdfConfronto').addEventListener('click', function(){
+  if(!lastConfronto){ runConfronto(); }
+  var a = lastConfronto.a, b = lastConfronto.b;
+  var diff = b.potereAcquisto - a.potereAcquisto;
+  buildReportHTML('Confronto Offerte di Lavoro', [
+    {title:'Offerta A', rows:[
+      ['RAL', fmt(a.ral)], ['Netto mensile busta', fmt(a.nettoMensileBusta)],
+      ['Buoni pasto / mese', fmt(a.buoniMensili)], ['Welfare / mese', fmt(a.welfare)],
+      ['Potere d\'acquisto mensile', fmt(a.potereAcquisto)]
+    ]},
+    {title:'Offerta B', rows:[
+      ['RAL', fmt(b.ral)], ['Netto mensile busta', fmt(b.nettoMensileBusta)],
+      ['Buoni pasto / mese', fmt(b.buoniMensili)], ['Welfare / mese', fmt(b.welfare)],
+      ['Potere d\'acquisto mensile', fmt(b.potereAcquisto)]
+    ]}
+  ], diff>=0 ? 'Offerta B conviene di' : 'Offerta A conviene di', fmt(Math.abs(diff)) + '/mese');
+  exportPdf('pratiko-confronto-offerte.pdf');
+});
+
+document.getElementById('btnPdfAumento').addEventListener('click', function(){
+  if(!lastAumento){ runAumento(); }
+  var a = lastAumento.attuale, b = lastAumento.nuova;
+  var extra = b.nettoMensileBusta - a.nettoMensileBusta;
+  buildReportHTML('Simulatore Aumento / Promozione', [
+    {title:'Situazione attuale', rows:[
+      ['RAL attuale', fmt(a.ral)], ['Netto mensile attuale', fmt(a.nettoMensileBusta)]
+    ]},
+    {title:'Nuova proposta', rows:[
+      ['RAL proposta', fmt(b.ral)], ['Netto mensile nuovo', fmt(b.nettoMensileBusta)],
+      ['Aliquota marginale', b.aliquotaMarginale + '%'],
+      ['Aumento lordo annuo', fmt(lastAumento.aumentoLordo)]
+    ]}
+  ], 'Extra netto reale al mese', fmt(extra) + '/mese');
+  exportPdf('pratiko-simulatore-aumento.pdf');
+});
+
+/* Run an initial calculation so the tool feels alive on load */
+runNetto();
+
+})();
+</script>
 </body>
 </html>
